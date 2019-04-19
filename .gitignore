@@ -1,0 +1,11 @@
+node_modules
+
+# Private
+.env
+
+# Builds
+dist
+build
+
+# Temp
+.cache

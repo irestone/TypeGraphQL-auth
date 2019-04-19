@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "target": "esnext",
+    "noImplicitAny": true,
+    "strictNullChecks": true
+  },
+  "exclude": [
+    "node_modules/**/*",
+  ],
+}
