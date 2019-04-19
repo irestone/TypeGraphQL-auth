@@ -1,9 +1,16 @@
 {
-  "name": "boilerplate",
-  "description": "",
-  "author": "",
+  "private": true,
+  "name": "typegql-auth",
+  "description": "Trying out TypeGraphQL",
+  "author": "Khan Bifov",
   "license": "ISC",
-  "version": "1.0.0",
+  "version": "0.1.0",
+  "homepage": "https://github.com/irestone/TypeGraphQL-auth#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/irestone/TypeGraphQL-auth.git"
+  },
+  "bugs": "https://github.com/irestone/TypeGraphQL-auth/issues",
   "main": "index.js",
   "scripts": {
     "start": "node bin/app",
@@ -44,6 +51,7 @@
     "prettier": "^1.16.4",
     "rollup": "^1.8.0",
     "rollup-plugin-babel": "^4.3.2",
+    "rollup-plugin-commonjs": "^9.3.4",
     "rollup-plugin-node-resolve": "^4.0.1",
     "rollup-plugin-terser": "^4.0.4",
     "rollup-plugin-typescript": "^1.0.1",

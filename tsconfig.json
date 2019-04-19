@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "removeComments": true,
-    "allowSyntheticDefaultImports": false,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "noFallthroughCasesInSwitch": true,
