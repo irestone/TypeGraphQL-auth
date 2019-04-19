@@ -1,8 +1,18 @@
 {
   "compilerOptions": {
     "target": "esnext",
+    "removeComments": true,
+    "allowSyntheticDefaultImports": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
-    "strictNullChecks": true
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
   },
   "exclude": [
     "node_modules/**/*",
