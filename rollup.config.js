@@ -13,7 +13,7 @@ const base = {
   output: { format: 'cjs' },
   plugins: [resolve(), cjs(), ts(), babel({ exclude: 'node_modules/**' })],
   external: Object.keys(pkg.dependencies),
-  watch: { clearScreen: true },
+  watch: { clearScreen: false },
 }
 
 const createConfig = (env) => {
