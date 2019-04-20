@@ -1,22 +1,25 @@
 import 'reflect-metadata'
 import express from 'express'
 import { ApolloServer } from 'apollo-server-express'
-import { buildSchema, Resolver, Query } from 'type-graphql'
+import { buildSchema } from 'type-graphql'
+import { createConnection, Connection } from 'typeorm'
 
-import { port, host } from './config'
-
-@Resolver()
-class HelloResolver {
-  @Query((): StringConstructor => String)
-  public hello(): string {
-    return 'hello world!'
-  }
-}
+import { port, host, typeorm } from './config'
+import * as resolvers from './resolvers'
 
 class Server {
   public static async start(): Promise<string> {
+    const connection: Connection = await createConnection(typeorm)
+    console.log(
+      `\n${
+        connection.isConnected
+          ? 'Connected to PostgreSQL'
+          : 'Connection to PostgreSQL failed'
+      }`
+    )
+
     const schema = await buildSchema({
-      resolvers: [HelloResolver],
+      resolvers: Object.values(resolvers),
     })
 
     const apollo = new ApolloServer({ schema })
@@ -33,10 +36,12 @@ class Server {
       }
     )
 
-    return `
-      Server  ${host}:${port}
-      GraphQL ${host}:${port}${apollo.graphqlPath}
-    `
+    const links: [string, string][] = [
+      ['Server', `http://${host}:${port}`],
+      ['GraphQL', `http://${host}:${port}${apollo.graphqlPath}`],
+    ]
+
+    return links.map(([name, url]): string => `${name}: ${url}`).join(`\n`)
   }
 }
 
