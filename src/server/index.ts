@@ -8,7 +8,7 @@ import { port, host, typeorm } from './config'
 import * as resolvers from './resolvers'
 
 class Server {
-  public static async start(): Promise<string> {
+  public static async bootstrap(): Promise<string> {
     const connection: Connection = await createConnection(typeorm)
     console.log(
       `\n${
@@ -45,6 +45,6 @@ class Server {
   }
 }
 
-Server.start()
+Server.bootstrap()
   .then((message: string): void => console.log(message))
   .catch((err: object): void => console.error(err))
