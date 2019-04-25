@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Arg } from 'type-graphql'
 import { hash } from 'bcryptjs'
 
 import { salt } from '../config'
-import { User } from '../types'
+import { User } from '../entities'
 import { RegisterInput } from './userResolver/RegisterInput'
 
 @Resolver(User)

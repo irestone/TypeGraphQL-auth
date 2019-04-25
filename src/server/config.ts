@@ -1,6 +1,6 @@
 import { ConnectionOptions } from 'typeorm'
 
-import * as types from './types'
+import * as entities from './entities'
 
 const {
   NODE_ENV = 'development',
@@ -36,5 +36,5 @@ export const typeorm: ConnectionOptions = {
   database: TYPEORM_DATABASE,
   synchronize: true,
   logging: false,
-  entities: Object.values(types),
+  entities: Object.values(entities),
 }

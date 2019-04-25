@@ -5,7 +5,7 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator'
 
-import { User } from '../../../types'
+import { User } from '../../../entities'
 
 @ValidatorConstraint({ async: true })
 class IsEmailUniqueConstraint implements ValidatorConstraintInterface {
