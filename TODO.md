@@ -1,1 +1,1 @@
-- rename `types` with `entities`
+- [x] rename `types` with `entities`
