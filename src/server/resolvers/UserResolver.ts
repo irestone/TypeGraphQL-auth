@@ -48,12 +48,11 @@ export class UserResolver {
   // ====={ Register }
 
   @Mutation((): typeof User => User)
-  public async register(@Arg('input')
-  {
-    email,
-    username,
-    password,
-  }: RegisterInput): Promise<User> {
+  public async register(
+    @Arg('input')
+    { email, username, password }: RegisterInput,
+    @Ctx() { req }: ITypeGraphQLContext
+  ): Promise<User> {
     const hashedPassword = await hashSync(password, salt)
 
     const user = await User.create({
@@ -61,6 +60,9 @@ export class UserResolver {
       username,
       password: hashedPassword,
     }).save()
+
+    if (!req.session) throw Error('Request session has not been created.')
+    req.session.userId = user.id
 
     return user
   }
