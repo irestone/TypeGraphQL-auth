@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Arg, Ctx } from 'type-graphql'
+import { Resolver, Query, Mutation, Arg, Ctx, Authorized } from 'type-graphql'
 import { compareSync, hashSync } from 'bcryptjs'
 import { UserInputError } from 'apollo-server-express'
 import { Request, Response } from 'express'
@@ -24,17 +24,20 @@ export class UserResolver {
 
   // ====={ Me }
 
+  @Authorized()
   @Query((): typeof User => User)
   public async me(@Ctx() { req }: ITypeGraphQLContext): Promise<User | null> {
     if (!req.session || !req.session.userId) {
       throw Error('Request session not found.')
     }
     const user = await User.findOne({ id: req.session.userId })
-    return user || null
+    if (!user) throw Error('User not found.')
+    return user
   }
 
   // ====={ Users }
 
+  @Authorized()
   @Query((): (typeof User)[] => [User])
   public async users(): Promise<User[]> {
     const users = await User.find()
@@ -69,6 +72,7 @@ export class UserResolver {
 
   // ====={ Deregister }
 
+  @Authorized()
   @Mutation((): GraphQLScalarType => GraphQLBoolean)
   public async deregister(
     @Arg('input') { username, password }: LoginInput,
@@ -79,24 +83,27 @@ export class UserResolver {
     if (!user || !compareSync(password, user.password)) {
       throw new UserInputError('Invalid username and password pair')
     }
+    const { id } = user
     await user.remove()
     // Delete session
-    await new Promise(
-      (resolve, reject): void => {
-        const { name } = sessionOptions
-        if (!req.session || !name) {
-          reject(new Error('Session not found'))
-        } else {
-          req.session.destroy(
-            (err): void => {
-              if (err) reject(err)
-              res.clearCookie(name)
-              resolve(true)
-            }
-          )
+    if (req.session && req.session.userId === id) {
+      await new Promise(
+        (resolve, reject): void => {
+          const { name } = sessionOptions
+          if (!req.session || !name) {
+            reject(new Error('Session not found'))
+          } else {
+            req.session.destroy(
+              (err): void => {
+                if (err) reject(err)
+                res.clearCookie(name)
+                resolve(true)
+              }
+            )
+          }
         }
-      }
-    )
+      )
+    }
     return true
   }
 
@@ -118,6 +125,7 @@ export class UserResolver {
 
   // ====={ Logout }
 
+  @Authorized()
   @Mutation((): GraphQLScalarType => GraphQLBoolean)
   public async logout(@Ctx() { req, res }: ITypeGraphQLContext): Promise<
     boolean

@@ -7,6 +7,7 @@ import expressSession from 'express-session'
 import connectRedis, { RedisStore as IRedisStore } from 'connect-redis'
 
 import * as resolvers from './resolvers'
+import { authChecker } from './auth/authChecker'
 import {
   port,
   host,
@@ -49,8 +50,12 @@ class Server {
   }
 
   private static async createApolloServer(): Promise<void> {
+    const schema = await buildSchema({
+      resolvers: Object.values(resolvers),
+      authChecker,
+    })
     const apollo = new ApolloServer({
-      schema: await buildSchema({ resolvers: Object.values(resolvers) }),
+      schema,
       context: ({ req, res }): object => ({ req, res }),
       playground: !inProduction && {
         settings: { 'request.credentials': 'include' } as any,
