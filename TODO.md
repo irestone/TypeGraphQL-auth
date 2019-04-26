@@ -1,1 +1,2 @@
 - [x] rename `types` with `entities`
+- [ ] find out why `ITypeGraphQLContext` can't be imported and casting error
