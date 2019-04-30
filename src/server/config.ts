@@ -1,6 +1,7 @@
 import { ConnectionOptions } from 'typeorm'
 import { SessionOptions } from 'express-session'
 import { RedisStoreOptions } from 'connect-redis'
+import IORedis, { Redis } from 'ioredis'
 
 import * as entities from './entities'
 
@@ -69,8 +70,12 @@ export const sessionOptions: SessionOptions = {
 }
 
 // Redis session store
-export const redisStoreOptions: RedisStoreOptions = {
+export const redisClient: Redis = new IORedis({
   host: REDIS_HOST,
   port: (REDIS_PORT && parseInt(REDIS_PORT)) || undefined,
-  pass: REDIS_PASS,
+  password: REDIS_PASS,
+})
+
+export const redisStoreOptions: RedisStoreOptions = {
+  client: redisClient as any,
 }

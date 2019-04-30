@@ -4,8 +4,10 @@ import { UserInputError } from 'apollo-server-express'
 import { Request, Response } from 'express'
 import { GraphQLBoolean, GraphQLScalarType } from 'graphql'
 
-import { salt, sessionOptions } from '../config'
+import { salt, sessionOptions, redisClient } from '../config'
 import { User } from '../entities'
+import { sendVerificationMail } from '../utils/mailer'
+
 import { RegisterInput } from './userResolver/RegisterInput'
 import { LoginInput } from './userResolver/LoginInput'
 
@@ -64,10 +66,23 @@ export class UserResolver {
       password: hashedPassword,
     }).save()
 
+    await sendVerificationMail(email)
+
     if (!req.session) throw Error('Request session has not been created.')
     req.session.userId = user.id
 
     return user
+  }
+
+  // ====={ Verify Email }
+
+  @Mutation((): BooleanConstructor => Boolean)
+  public async verify(@Arg('token') token: string): Promise<boolean> {
+    const email = await redisClient.get(token)
+    if (!email) throw new UserInputError('Verification token is not valid')
+    await User.update({ email }, { verified: true })
+    await redisClient.del(token)
+    return true
   }
 
   // ====={ Deregister }
@@ -118,7 +133,10 @@ export class UserResolver {
     if (!user || !compareSync(password, user.password)) {
       throw new UserInputError('Invalid username and password pair')
     }
-    if (!req.session) throw Error('Request session has not been created.')
+    if (!user.verified) {
+      throw new Error(`You've not verified your email address`)
+    }
+    if (!req.session) throw new Error('Request session has not been created.')
     req.session.userId = user.id
     return user
   }
