@@ -79,3 +79,5 @@ export const redisClient: Redis = new IORedis({
 export const redisStoreOptions: RedisStoreOptions = {
   client: redisClient as any,
 }
+
+export const tokenExpirationTime = 86400
