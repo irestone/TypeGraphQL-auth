@@ -6,10 +6,17 @@ import { GraphQLBoolean, GraphQLScalarType } from 'graphql'
 
 import { salt, sessionOptions, redisClient } from '../config'
 import { User } from '../entities'
-import { sendVerificationMail } from '../utils/mailer'
+import { sendVerificationMail, sendChangePasswordMail } from '../utils/mailer'
+import {
+  verifyUserPrefix,
+  changePasswordPrefix,
+} from '../constants/tokenPrefixes'
 
-import { RegisterInput } from './userResolver/RegisterInput'
-import { LoginInput } from './userResolver/LoginInput'
+import {
+  RegisterInput,
+  LoginInput,
+  ChangePasswordInput,
+} from './inputTypes/UserInputTypes'
 
 // todo move it common
 // ? why is it getting error when importing?
@@ -74,17 +81,6 @@ export class UserResolver {
     return user
   }
 
-  // ====={ Verify Email }
-
-  @Mutation((): BooleanConstructor => Boolean)
-  public async verify(@Arg('token') token: string): Promise<boolean> {
-    const email = await redisClient.get(token)
-    if (!email) throw new UserInputError('Verification token is not valid')
-    await User.update({ email }, { verified: true })
-    await redisClient.del(token)
-    return true
-  }
-
   // ====={ Deregister }
 
   @Authorized()
@@ -130,13 +126,10 @@ export class UserResolver {
     @Ctx() { req }: ITypeGraphQLContext
   ): Promise<User> {
     const user = await User.findOne({ username })
-    if (!user || !compareSync(password, user.password)) {
-      throw new UserInputError('Invalid username and password pair')
-    }
-    if (!user.verified) {
-      throw new Error(`You've not verified your email address`)
-    }
-    if (!req.session) throw new Error('Request session has not been created.')
+    if (!user || !compareSync(password, user.password))
+      throw new UserInputError('Wrong username/password')
+    if (!user.verified) throw new Error(`Not verified`)
+    if (!req.session) throw new Error('Session not found')
     req.session.userId = user.id
     return user
   }
@@ -164,5 +157,49 @@ export class UserResolver {
         }
       }
     )
+  }
+
+  // ====={ Verify Email }
+
+  @Mutation((): BooleanConstructor => Boolean)
+  public async verify(@Arg('token') token: string): Promise<boolean> {
+    const redisKey = verifyUserPrefix + token
+    const email = await redisClient.get(redisKey)
+    if (!email) throw new UserInputError('Bad token')
+    const user = await User.findOne({ email })
+    if (!user) throw new Error('User not found')
+    user.verified = true
+    await user.save()
+    await redisClient.del(redisKey)
+    return true
+  }
+
+  // ====={ Forget Password }
+
+  @Mutation((): BooleanConstructor => Boolean)
+  public async forgetPassword(@Arg('email') email: string): Promise<boolean> {
+    const user = await User.findOne({ email })
+    if (!user) throw new Error('User not found')
+    await sendChangePasswordMail(email)
+    return true
+  }
+
+  // ====={ Change Password }
+
+  @Mutation((): BooleanConstructor => Boolean)
+  public async changePassword(@Arg('input')
+  {
+    token,
+    newPassword,
+  }: ChangePasswordInput): Promise<boolean> {
+    const redisKey = changePasswordPrefix + token
+    const email = await redisClient.get(redisKey)
+    if (!email) throw new UserInputError('Bad token')
+    const user = await User.findOne({ email })
+    if (!user) throw new Error('User not found')
+    user.password = hashSync(newPassword, salt)
+    await user.save()
+    await redisClient.del(redisKey)
+    return true
   }
 }
