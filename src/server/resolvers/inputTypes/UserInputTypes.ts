@@ -1,7 +1,7 @@
 import { InputType, Field } from 'type-graphql'
 import { Length, IsEmail, MinLength } from 'class-validator'
 
-import { IsEmailUnique } from './UserInputTypes/IsEmailUnique'
+import { IsEmailUnique } from './userInputTypes/IsEmailUnique'
 
 const minPasswordLength = 3
 
