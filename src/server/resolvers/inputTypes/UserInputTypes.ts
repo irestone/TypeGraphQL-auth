@@ -1,14 +1,13 @@
 import { InputType, Field } from 'type-graphql'
-import { Length, IsEmail, MinLength } from 'class-validator'
+import { Length, IsEmail } from 'class-validator'
 
 import { IsEmailUnique } from './userInputTypes/IsEmailUnique'
-
-const minPasswordLength = 3
+import { PasswordInputFieldMixin } from './fields/PasswordInputField.mixin'
 
 // ====={ Register }
 
 @InputType()
-export class RegisterInput {
+export class RegisterInput extends PasswordInputFieldMixin() {
   @Field()
   @IsEmail()
   @IsEmailUnique({ message: 'Email $value is already in use' })
@@ -17,10 +16,6 @@ export class RegisterInput {
   @Field()
   @Length(1, 100)
   public username: string
-
-  @Field()
-  @MinLength(minPasswordLength)
-  public password: string
 }
 
 // ====={ Login }
@@ -31,18 +26,13 @@ export class LoginInput {
   public username: string
 
   @Field()
-  @MinLength(minPasswordLength)
   public password: string
 }
 
 // ====={ Change Password }
 
 @InputType()
-export class ChangePasswordInput {
+export class ChangePasswordInput extends PasswordInputFieldMixin() {
   @Field()
   public token: string
-
-  @Field()
-  @MinLength(minPasswordLength)
-  public newPassword: string
 }
