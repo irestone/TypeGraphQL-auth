@@ -1,2 +1,6 @@
+- Track this issues and replace classes w/ interfaces when they fixed
+  - https://github.com/rollup/rollup-plugin-typescript/issues/65
+  - https://github.com/rollup/rollup-plugin-typescript/issues/109
+
 - Find out why `ITypeGraphQLContext` can't be imported and casting error
-- Split `UserResolver` into several separate queries and mutations. Transform them to mixins to be extended by `UserResolver`
+- Transform resolver mixins into resolvers and import them as is. Simplify structure in general
