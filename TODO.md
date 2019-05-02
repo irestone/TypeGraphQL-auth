@@ -1,2 +1,2 @@
-- [x] rename `types` with `entities`
-- [ ] find out why `ITypeGraphQLContext` can't be imported and casting error
+- Find out why `ITypeGraphQLContext` can't be imported and casting error
+- Split `UserResolver` into several separate queries and mutations. Transform them to mixins to be extended by `UserResolver`
