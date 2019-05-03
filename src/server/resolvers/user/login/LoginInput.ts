@@ -1,7 +1,7 @@
 import { InputType, Field } from 'type-graphql'
 
 @InputType()
-export class LoginMutationInput {
+export class LoginInput {
   @Field()
   public email: string
 

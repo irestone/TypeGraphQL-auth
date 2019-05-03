@@ -2,10 +2,10 @@ import { InputType, Field } from 'type-graphql'
 
 import { PasswordInputField } from '../inputFields/PasswordInputField.mixin'
 
-const RegisterMutationInputBase = PasswordInputField()
+const ChangePasswordInputBase = PasswordInputField()
 
 @InputType()
-export class ChangePasswordMutationInput extends RegisterMutationInputBase {
+export class ChangePasswordInput extends ChangePasswordInputBase {
   @Field()
   public token: string
 }

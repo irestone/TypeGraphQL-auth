@@ -1,7 +1,7 @@
 import { InputType, Field } from 'type-graphql'
 
 @InputType()
-export class DeregesterMutationInput {
+export class DeregesterInput {
   @Field()
   public email: string
 

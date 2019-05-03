@@ -5,12 +5,12 @@ import {
   ValidatorConstraintInterface,
 } from 'class-validator'
 
-import { User } from '../../../entities'
+import { User } from '../../../../entities'
 
 @ValidatorConstraint({ async: true })
 class IsEmailUniqueConstraint implements ValidatorConstraintInterface {
   public async validate(email: string): Promise<boolean> {
-    const user = await User.findOne({ where: { email } })
+    const user = await User.findOne({ email })
     return !user
   }
 }

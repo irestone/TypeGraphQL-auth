@@ -3,15 +3,15 @@ import { Length, IsEmail } from 'class-validator'
 
 import { PasswordInputField } from '../inputFields/PasswordInputField.mixin'
 
-import { IsEmailUniqueValidator } from './registerMutationInput/IsEmailUniqueValidator.decorator'
+import { IsEmailUnique } from './registerInput/IsEmailUnique.decorator'
 
-const RegisterMutationInputBase = PasswordInputField()
+const RegisterInputBase = PasswordInputField()
 
 @InputType()
-export class RegisterMutationInput extends RegisterMutationInputBase {
+export class RegisterInput extends RegisterInputBase {
   @Field()
   @IsEmail()
-  @IsEmailUniqueValidator({ message: 'Email $value is already in use' })
+  @IsEmailUnique({ message: 'Email $value is already in use' })
   public email: string
 
   @Field()
