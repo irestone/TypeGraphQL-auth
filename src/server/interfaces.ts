@@ -7,3 +7,7 @@ export class IGQLContext {
   public req: Request
   public res: Response
 }
+
+export class IServerInfo {
+  public links: string
+}

@@ -8,6 +8,7 @@ import connectRedis, { RedisStore as IRedisStore } from 'connect-redis'
 
 import * as resolvers from './resolvers'
 import { authChecker } from './auth/authChecker'
+import { IServerInfo } from './interfaces'
 import {
   port,
   host,
@@ -16,10 +17,6 @@ import {
   sessionOptions,
   redisStoreOptions,
 } from './config'
-
-interface IServerInfo {
-  links: string
-}
 
 class Server {
   private static app: Application
