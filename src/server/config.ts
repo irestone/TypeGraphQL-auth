@@ -1,9 +1,11 @@
 import { ConnectionOptions } from 'typeorm'
 import { SessionOptions } from 'express-session'
 import { RedisStoreOptions } from 'connect-redis'
-import IORedis, { Redis } from 'ioredis'
-
 import * as entities from './entities'
+// import IORedis, { Redis } from 'ioredis'
+import { Redis } from 'ioredis'
+
+const IORedis = require('ioredis')
 
 const {
   HOST = 'localhost',
@@ -28,6 +30,8 @@ const {
 
 export const env: string = NODE_ENV
 export const inProduction: boolean = env === 'production'
+export const inDevelopment: boolean = env === 'development'
+export const inTest: boolean = env === 'test'
 
 export const host: string = HOST
 export const port: number = parseInt(PORT)
@@ -40,16 +44,22 @@ export const salt: number = parseInt(SALT)
 // DOMAIN
 
 // Postgress ORM
-export const ormConnectionOptions: ConnectionOptions = {
-  type: 'postgres',
-  host: ORM_HOST,
-  port: parseInt(ORM_PORT),
-  username: ORM_USERNAME,
-  password: ORM_PASSWORD,
-  database: ORM_DATABASE,
-  synchronize: true,
-  logging: false,
-  entities: Object.values(entities),
+export const ormConnectionOptions = (
+  dropSchema: boolean = false
+): ConnectionOptions => {
+  if (dropSchema && !(inDevelopment || inTest))
+    throw new Error('Trying to drop DB being not in dev or test env')
+  return {
+    type: 'postgres',
+    host: ORM_HOST,
+    port: parseInt(ORM_PORT),
+    username: ORM_USERNAME,
+    password: ORM_PASSWORD,
+    database: inTest ? ORM_DATABASE + '-test' : ORM_DATABASE,
+    dropSchema,
+    synchronize: dropSchema || inDevelopment,
+    entities: Object.values(entities),
+  }
 }
 
 // SESSION

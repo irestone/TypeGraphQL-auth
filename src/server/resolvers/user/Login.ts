@@ -4,7 +4,7 @@ import { compareSync } from 'bcryptjs'
 import { User } from '../../entities'
 import { IGQLContext } from '../../interfaces'
 
-import { LoginInput } from './login/LoginInput'
+import { LoginInput } from './login/Input'
 
 // todo @Authorized('GUEST')
 

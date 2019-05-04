@@ -1,13 +1,10 @@
 import 'reflect-metadata'
 import express, { Application } from 'express'
 import { ApolloServer } from 'apollo-server-express'
-import { buildSchema } from 'type-graphql'
 import { createConnection, Connection } from 'typeorm'
 import expressSession from 'express-session'
 import connectRedis, { RedisStore as IRedisStore } from 'connect-redis'
 
-import * as resolvers from './resolvers'
-import { authChecker } from './auth/authChecker'
 import { IServerInfo } from './interfaces'
 import {
   port,
@@ -17,6 +14,7 @@ import {
   sessionOptions,
   redisStoreOptions,
 } from './config'
+import { buildSchema } from './utils/buildSchema'
 
 class Server {
   private static app: Application
@@ -32,7 +30,9 @@ class Server {
   }
 
   private static async connectToDB(): Promise<void> {
-    const connection: Connection = await createConnection(ormConnectionOptions)
+    const connection: Connection = await createConnection(
+      ormConnectionOptions()
+    )
     if (!connection.isConnected) throw new Error('DB connection failed')
   }
 
@@ -47,12 +47,8 @@ class Server {
   }
 
   private static async createApolloServer(): Promise<void> {
-    const schema = await buildSchema({
-      resolvers: Object.values(resolvers),
-      authChecker,
-    })
     const apollo = new ApolloServer({
-      schema,
+      schema: buildSchema(),
       context: ({ req, res }): object => ({ req, res }),
       playground: !inProduction && {
         settings: { 'request.credentials': 'include' } as any,

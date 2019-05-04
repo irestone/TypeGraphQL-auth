@@ -6,7 +6,7 @@ import { User } from '../../entities'
 import { sessionOptions } from '../../config'
 import { IGQLContext } from '../../interfaces'
 
-import { DeregesterInput } from './deregester/DeregesterInput'
+import { DeregesterInput } from './deregester/Input'
 
 @Resolver()
 export class Deregester {

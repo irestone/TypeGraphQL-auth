@@ -16,10 +16,8 @@ export const sendVerificationMail = async (to: string): Promise<void> => {
       pass: account.pass,
     },
   })
-
   const token = await generateToken(verifyUserPrefix, to)
   const url = userVerificationPath(token)
-
   const info = await transporter.sendMail({
     from: 'TGQL-auth <foo@example.com>',
     to,

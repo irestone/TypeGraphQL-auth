@@ -6,7 +6,7 @@ import { User } from '../../entities'
 import { redisClient, salt } from '../../config'
 import { changePasswordPrefix } from '../../constants/tokenPrefixes'
 
-import { ChangePasswordInput } from './changePassword/ChangePasswordInput'
+import { ChangePasswordInput } from './changePassword/Input'
 
 @Resolver()
 export class ChangePassword {

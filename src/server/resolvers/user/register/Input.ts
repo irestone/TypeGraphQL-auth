@@ -1,14 +1,14 @@
 import { InputType, Field } from 'type-graphql'
 import { Length, IsEmail } from 'class-validator'
 
-import { PasswordInputField } from '../inputFields/PasswordInputField.mixin'
+import { PasswordInputField } from '../inputFields/Password'
 
-import { IsEmailUnique } from './registerInput/IsEmailUnique.decorator'
+import { IsEmailUnique } from './input/IsEmailUnique'
 
-const RegisterInputBase = PasswordInputField()
+const Base = PasswordInputField()
 
 @InputType()
-export class RegisterInput extends RegisterInputBase {
+export class RegisterInput extends Base {
   @Field()
   @IsEmail()
   @IsEmailUnique({ message: 'Email $value is already in use' })

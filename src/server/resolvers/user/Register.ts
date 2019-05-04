@@ -6,7 +6,7 @@ import { IGQLContext } from '../../interfaces'
 import { salt } from '../../config'
 import { sendVerificationMail } from '../../utils/mail/verify'
 
-import { RegisterInput } from './register/RegisterInput'
+import { RegisterInput } from './register/Input'
 
 // todo @Authorized('GUEST')
 
@@ -16,9 +16,9 @@ export class Register {
   public async register(
     @Arg('input')
     { email, password, username }: RegisterInput,
-    @Ctx() { req }: IGQLContext
+    @Ctx() ctx: IGQLContext
   ): Promise<User> {
-    const hashedPassword = await hashSync(password, salt)
+    const hashedPassword = hashSync(password, salt)
     const user = await User.create({
       email,
       password: hashedPassword,
@@ -26,6 +26,8 @@ export class Register {
     })
     await user.save()
     await sendVerificationMail(email)
+    if (!ctx) throw new Error('Context not provided')
+    const { req } = ctx
     if (!req.session) throw Error('Session not found')
     req.session.userId = user.id
     return user
