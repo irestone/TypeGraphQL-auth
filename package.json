@@ -25,7 +25,7 @@
     "clean:prod": "rm -rf dist",
     "prelint": "eslint --print-config . | eslint-config-prettier-check",
     "lint": "eslint \"src/**/*.{ts,tsx}\"",
-    "pretest": "cross-env NODE_ENV=test ts-node ./src/server/utils/test/setup.ts",
+    "pretest": "cross-env NODE_ENV=test ts-node -r dotenv/config ./src/server/utils/test/setup.ts",
     "test": "jest",
     "@rollup": "rollup -c --environment"
   },

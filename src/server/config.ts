@@ -6,6 +6,8 @@ import * as entities from './entities'
 import { Redis } from 'ioredis'
 const IORedis = require('ioredis')
 
+require('dotenv').config()
+
 const { env: Env } = process
 
 // ========================================
@@ -37,8 +39,8 @@ export const tokenExpirationTime = parseInt(Env.TOKEN_EXPTIME)
 
 // ====={ Domain }
 
-const { DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME } = Env
-if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASS || !DB_NAME)
+const { DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME, DB_TEST_NAME } = Env
+if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASS || !DB_NAME || !DB_TEST_NAME)
   throw new Error('DB option(s) has not been set.')
 
 export const ormConnectionOptions = (
@@ -52,7 +54,7 @@ export const ormConnectionOptions = (
     port: parseInt(DB_PORT),
     username: DB_USER,
     password: DB_PASS,
-    database: inTest ? `${DB_NAME}-test` : DB_NAME,
+    database: inTest ? DB_TEST_NAME : DB_NAME,
     dropSchema,
     synchronize: dropSchema || inDevelopment,
     entities: Object.values(entities),

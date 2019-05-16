@@ -1,8 +1,10 @@
-import nodemailer from 'nodemailer'
+// import nodemailer from 'nodemailer'
 
 import { userVerificationPath } from '../../paths'
 import { verifyUserPrefix } from '../../constants/tokenPrefixes'
 import { generateToken } from '../tokenGenerator'
+
+const nodemailer = require('nodemailer')
 
 export const sendVerificationMail = async (to: string): Promise<void> => {
   const account = await nodemailer.createTestAccount()

@@ -6,6 +6,7 @@ import expressSession from 'express-session'
 import connectRedis, { RedisStore as IRedisStore } from 'connect-redis'
 
 import { IServerInfo } from './interfaces'
+import { buildSchema } from './utils/buildSchema'
 import {
   port,
   host,
@@ -14,7 +15,6 @@ import {
   sessionOptions,
   redisStoreOptions,
 } from './config'
-import { buildSchema } from './utils/buildSchema'
 
 class Server {
   private static app: Application

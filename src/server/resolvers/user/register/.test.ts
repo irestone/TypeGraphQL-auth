@@ -49,8 +49,7 @@ const variableValues = {
 
 describe('Register', (): void => {
   it('creates user', async (): Promise<void> => {
-    jest.setTimeout(30000)
     const { errors } = await gqlCall({ source, variableValues })
-    if (errors) errors.forEach(err => console.error(err))
+    if (errors) errors.forEach(err => { throw err })
   })
 })
