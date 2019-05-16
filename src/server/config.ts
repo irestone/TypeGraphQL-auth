@@ -4,67 +4,67 @@ import { RedisStoreOptions } from 'connect-redis'
 import * as entities from './entities'
 // import IORedis, { Redis } from 'ioredis'
 import { Redis } from 'ioredis'
-
 const IORedis = require('ioredis')
 
-const {
-  HOST = 'localhost',
-  NODE_ENV = 'development',
-  ORM_DATABASE = 'playground',
-  ORM_HOST = 'localhost',
-  ORM_PASSWORD = 'postgres',
-  ORM_PORT = '5432',
-  ORM_USERNAME = 'postgres',
-  PORT = '8080',
-  REDIS_HOST,
-  REDIS_PASS,
-  REDIS_PORT,
-  SALT = '12',
-  SESS_LIFETIME = '3600000',
-  SESS_NAME = 'sid',
-  SESS_SECRET = 'secret',
-} = process.env
+const { env: Env } = process
 
-// /////////////////////////////////////////////////////////////////////////////
-// ENVIRONMENT
+// ========================================
+//  ENVIRONMENT
+// ========================================
 
-export const env: string = NODE_ENV
+if (!Env.NODE_ENV) throw new Error('Environment has not been set.')
+export const env: string = Env.NODE_ENV
 export const inProduction: boolean = env === 'production'
 export const inDevelopment: boolean = env === 'development'
 export const inTest: boolean = env === 'test'
 
-export const host: string = HOST
-export const port: number = parseInt(PORT)
+if (!Env.HOST) throw new Error('Host has not been set.')
+export const host: string = Env.HOST
 
-export const salt: number = parseInt(SALT)
+if (!Env.PORT) throw new Error('Port has not been set.')
+export const port: number = parseInt(Env.PORT)
 
-// /////////////////////////////////////////////////////////////////////////////
-// DATA STORAGE
+if (!Env.SALT) throw new Error('Salt has not been set.')
+export const salt: number = parseInt(Env.SALT)
 
-// DOMAIN
+if (!Env.TOKEN_EXPTIME)
+  throw new Error('Token expiration time has not been set.')
+export const tokenExpirationTime = parseInt(Env.TOKEN_EXPTIME)
 
-// Postgress ORM
+// ========================================
+//  DATA
+// ========================================
+
+// ====={ Domain }
+
+const { DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME } = Env
+if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASS || !DB_NAME)
+  throw new Error('DB option(s) has not been set.')
+
 export const ormConnectionOptions = (
   dropSchema: boolean = false
 ): ConnectionOptions => {
   if (dropSchema && !(inDevelopment || inTest))
-    throw new Error('Trying to drop DB being not in dev or test env')
+    throw new Error('Trying to drop DB being not in dev or test environment.')
   return {
     type: 'postgres',
-    host: ORM_HOST,
-    port: parseInt(ORM_PORT),
-    username: ORM_USERNAME,
-    password: ORM_PASSWORD,
-    database: inTest ? ORM_DATABASE + '-test' : ORM_DATABASE,
+    host: DB_HOST,
+    port: parseInt(DB_PORT),
+    username: DB_USER,
+    password: DB_PASS,
+    database: inTest ? `${DB_NAME}-test` : DB_NAME,
     dropSchema,
     synchronize: dropSchema || inDevelopment,
     entities: Object.values(entities),
   }
 }
 
-// SESSION
+// ====={ Session }
 
-// Sessions and cookies
+const { SESS_NAME, SESS_SECRET, SESS_LIFETIME } = Env
+if (!SESS_NAME || !SESS_SECRET || !SESS_LIFETIME)
+  throw new Error('Session option(s) has not been set.')
+
 export const sessionOptions: SessionOptions = {
   name: SESS_NAME,
   secret: SESS_SECRET,
@@ -79,15 +79,16 @@ export const sessionOptions: SessionOptions = {
   },
 }
 
-// Redis session store
+const { REDIS_HOST, REDIS_PORT, REDIS_PASS } = Env
+if (!REDIS_HOST || !REDIS_PORT || !REDIS_PASS)
+  throw new Error('Redis option(s) has not been set.')
+
 export const redisClient: Redis = new IORedis({
   host: REDIS_HOST,
-  port: (REDIS_PORT && parseInt(REDIS_PORT)) || undefined,
+  port: parseInt(REDIS_PORT),
   password: REDIS_PASS,
 })
 
 export const redisStoreOptions: RedisStoreOptions = {
   client: redisClient as any,
 }
-
-export const tokenExpirationTime = 86400
