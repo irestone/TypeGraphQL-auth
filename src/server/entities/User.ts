@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from 'typeorm'
+import { Entity, Column, BaseEntity, ObjectID, ObjectIdColumn } from 'typeorm'
 import { ObjectType, Field, ID } from 'type-graphql'
 import { GraphQLScalarType } from 'graphql'
 
@@ -6,8 +6,8 @@ import { GraphQLScalarType } from 'graphql'
 @Entity()
 export class User extends BaseEntity {
   @Field((): GraphQLScalarType => ID)
-  @PrimaryGeneratedColumn()
-  public id: number
+  @ObjectIdColumn()
+  public id: ObjectID
 
   @Field()
   @Column('text') // todo make it unique

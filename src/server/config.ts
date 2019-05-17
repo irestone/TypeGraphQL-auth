@@ -49,12 +49,12 @@ export const ormConnectionOptions = (
   if (dropSchema && !(inDevelopment || inTest))
     throw new Error('Trying to drop DB being not in dev or test environment.')
   return {
-    type: 'postgres',
+    type: 'mongodb',
     host: DB_HOST,
     port: parseInt(DB_PORT),
+    database: inTest ? DB_TEST_NAME : DB_NAME,
     username: DB_USER,
     password: DB_PASS,
-    database: inTest ? DB_TEST_NAME : DB_NAME,
     dropSchema,
     synchronize: dropSchema || inDevelopment,
     entities: Object.values(entities),
