@@ -2,6 +2,9 @@ import { Connection } from 'typeorm'
 
 import { connectdb } from '../../../utils/test/dbconnection'
 import { gqlCall } from '../../../utils/test/gqlCall'
+import { User } from '../../../entities'
+
+const faker = require('faker')
 
 // ========================================
 //  SETUP
@@ -32,12 +35,11 @@ mutation Register($input: RegisterInput!) {
   }
 }
 `
-
 const variableValues = {
   input: {
-    email: 'test@email.com',
-    password: 'test',
-    username: 'test'
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+    username: faker.internet.userName(),
   }
 }
 
@@ -48,8 +50,22 @@ const variableValues = {
 // ========================================
 
 describe('Register', (): void => {
-  it('creates user', async (): Promise<void> => {
-    const { errors } = await gqlCall({ source, variableValues })
-    if (errors) errors.forEach(err => { throw err })
+  it('creates a user', async (): Promise<void> => {
+    const { errors, data } = await gqlCall({ source, variableValues })
+
+    expect(errors).toBeUndefined()
+
+    expect(data).toMatchObject({
+      register: {
+        email: variableValues.input.email,
+        username: variableValues.input.username
+      }
+    })
+
+    const dbUser = await User.findOne({ email: variableValues.input.email })
+
+    expect(dbUser).toBeDefined()
+    expect(dbUser!.email).toBe(variableValues.input.email)
+    expect(dbUser!.verified).toBeFalsy()
   })
 })

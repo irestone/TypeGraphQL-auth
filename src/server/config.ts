@@ -34,34 +34,77 @@ if (!Env.TOKEN_EXPTIME)
 export const tokenExpirationTime = parseInt(Env.TOKEN_EXPTIME)
 
 // ========================================
-//  DATA
+//  DOMAIN DATABASE
 // ========================================
 
-// ====={ Domain }
+interface IDBCredentials {
+  host: string
+  port: number
+  database: string
+  username: string
+  password: string
+}
 
-const { DB_HOST, DB_PORT, DB_USER, DB_PASS, DB_NAME, DB_TEST_NAME } = Env
-if (!DB_HOST || !DB_PORT || !DB_USER || !DB_PASS || !DB_NAME || !DB_TEST_NAME)
-  throw new Error('DB option(s) has not been set.')
+let dbCredentials: IDBCredentials
+
+switch (env) {
+  case 'development':
+    const { DB_HOST, DB_PORT, DB_NAME, DB_USER, DB_PASS } = Env
+    if (!DB_HOST || !DB_PORT || !DB_NAME || !DB_USER || !DB_PASS)
+      throw new Error('DB credentials has not been set.')
+    dbCredentials = {
+      host: DB_HOST,
+      port: parseInt(DB_PORT),
+      database: DB_NAME,
+      username: DB_USER,
+      password: DB_PASS,
+    }
+    break
+  case 'test':
+    const {
+      DB_TEST_HOST,
+      DB_TEST_PORT,
+      DB_TEST_NAME,
+      DB_TEST_USER,
+      DB_TEST_PASS,
+    } = Env
+    if (
+      !DB_TEST_HOST ||
+      !DB_TEST_PORT ||
+      !DB_TEST_NAME ||
+      !DB_TEST_USER ||
+      !DB_TEST_PASS
+    )
+      throw new Error('Test DB credentials has not been set.')
+    dbCredentials = {
+      host: DB_TEST_HOST,
+      port: parseInt(DB_TEST_PORT),
+      database: DB_TEST_NAME,
+      username: DB_TEST_USER,
+      password: DB_TEST_PASS,
+    }
+    break
+  default:
+    throw new Error('Unknown environment for DB')
+}
 
 export const ormConnectionOptions = (
   dropSchema: boolean = false
 ): ConnectionOptions => {
   if (dropSchema && !(inDevelopment || inTest))
-    throw new Error('Trying to drop DB being not in dev or test environment.')
+    throw new Error('Droping DB tables being not in dev or test environment.')
   return {
+    ...dbCredentials,
     type: 'mongodb',
-    host: DB_HOST,
-    port: parseInt(DB_PORT),
-    database: inTest ? DB_TEST_NAME : DB_NAME,
-    username: DB_USER,
-    password: DB_PASS,
     dropSchema,
     synchronize: dropSchema || inDevelopment,
     entities: Object.values(entities),
   }
 }
 
-// ====={ Session }
+// ========================================
+//  SESSION DATABASE
+// ========================================
 
 const { SESS_NAME, SESS_SECRET, SESS_LIFETIME } = Env
 if (!SESS_NAME || !SESS_SECRET || !SESS_LIFETIME)
