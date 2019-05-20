@@ -31,7 +31,11 @@ export const salt: number = parseInt(Env.SALT)
 
 if (!Env.TOKEN_EXPTIME)
   throw new Error('Token expiration time has not been set.')
-export const tokenExpirationTime = parseInt(Env.TOKEN_EXPTIME)
+export const tokenExpirationTime: number = parseInt(Env.TOKEN_EXPTIME)
+
+if (!Env.MAX_QUERY_COMPLEXITY)
+  throw new Error('Maximum query complexity has not been set.')
+export const maxQC: number = parseInt(Env.MAX_QUERY_COMPLEXITY)
 
 // ========================================
 //  DOMAIN DATABASE

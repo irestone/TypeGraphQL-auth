@@ -4,6 +4,10 @@ import { ApolloServer } from 'apollo-server-express'
 import { createConnection, Connection } from 'typeorm'
 import expressSession from 'express-session'
 import connectRedis, { RedisStore as IRedisStore } from 'connect-redis'
+import queryComplexity, {
+  fieldConfigEstimator,
+  simpleEstimator,
+} from 'graphql-query-complexity'
 
 import { IServerInfo } from './interfaces'
 import { buildSchema } from './utils/buildSchema'
@@ -14,6 +18,7 @@ import {
   ormConnectionOptions,
   sessionOptions,
   redisStoreOptions,
+  maxQC,
 } from './config'
 
 class Server {
@@ -53,6 +58,19 @@ class Server {
       playground: !inProduction && {
         settings: { 'request.credentials': 'include' } as any,
       },
+      validationRules: [
+        queryComplexity({
+          maximumComplexity: maxQC,
+          variables: {},
+          onComplete: (complexity: number): void => {
+            console.log('Query Complexity:', complexity)
+          },
+          estimators: [
+            fieldConfigEstimator(),
+            simpleEstimator({ defaultComplexity: 1 }),
+          ],
+        }) as any,
+      ],
     })
     apollo.applyMiddleware({ app: Server.app, cors: false })
     Server.links.GraphQL = `http://${host}:${port}${apollo.graphqlPath}`

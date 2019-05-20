@@ -84,6 +84,7 @@
     "express": "^4.16.4",
     "express-session": "^1.16.1",
     "graphql": "^14.2.1",
+    "graphql-query-complexity": "^0.3.0",
     "ioredis": "^4.9.0",
     "lodash": "^4.17.11",
     "mongodb": "^3.2.4",
