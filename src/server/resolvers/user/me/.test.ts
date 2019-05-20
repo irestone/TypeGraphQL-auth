@@ -25,45 +25,44 @@ afterAll(async (): Promise<void> => {
 // ====={ Prepearing call options }
 
 const source = `
-mutation Register($input: RegisterInput!) {
-  register(
-    input: $input
-  ) {
+{
+  me {
     id
     email
     username
   }
 }
 `
-const variableValues = {
-  input: {
-    email: faker.internet.email(),
-    password: faker.internet.password(),
-    username: faker.internet.userName(),
-  }
-}
 
 // ========================================
 //  TEST
 // ========================================
 
-describe('Register', (): void => {
-  it('creates a user', async (): Promise<void> => {
-    const { errors, data } = await gqlCall({ source, variableValues })
+describe('Me', (): void => {
+  it('gets the user', async (): Promise<void> => {
+    const user = User.create({
+      email: faker.internet.email(),
+      password: faker.internet.password(),
+      username: faker.internet.userName(),
+    })
+
+    await user.save()
+
+    const { errors, data } = await gqlCall({ source, userId: user.id })
 
     expect(errors).toBeUndefined()
 
     expect(data).toMatchObject({
-      register: {
-        email: variableValues.input.email,
-        username: variableValues.input.username
+      me: {
+        id: user.id.toHexString(),
+        email: user.email,
+        username: user.username
       }
     })
+  })
 
-    const dbUser = await User.findOne({ email: variableValues.input.email })
-
-    expect(dbUser).toBeDefined()
-    expect(dbUser!.email).toBe(variableValues.input.email)
-    expect(dbUser!.verified).toBeFalsy()
+  it('throws an error, if user is not logged in', async (): Promise<void> => {
+    const { errors } = await gqlCall({ source })
+    expect(errors).toBeDefined()
   })
 })
